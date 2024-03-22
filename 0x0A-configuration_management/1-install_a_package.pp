@@ -1,4 +1,5 @@
-# installs the package puppet-lint
+#!/usr/bin/pup
+# installs a specific version of flask
 package { 'flask':
   ensure   => '2.1.0',
   provider => 'pip3'
