@@ -1,17 +1,28 @@
 #!/usr/bin/python3
-"""Script to export data in the CSV format"""
-import csv
-import requests as r
-import sys
+"""pulls todo from a given employee id"""
+
+import requests
+from sys import argv
+
 
 if __name__ == "__main__":
-    user_id = sys.argv[1]
-    url = "https://jsonplaceholder.typicode.com/"
-    usr = r.get(url + "users/{}".format(user_id)).json()
-    username = usr.get("username")
-    to_do = r.get(url + "todos", params={"userId": user_id}).json()
+    employeeRequest = requests.get(
+        "https://jsonplaceholder.typicode.com/users/" + argv[1])
+    employeeDict = employeeRequest.json()
 
-    with open("{}.csv".format(user_id), "w", newline="") as csvfile:
-        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-        [writer.writerow([user_id, username, elm.get("completed"),
-                          elm.get("title")]) for elm in to_do]
+    todoRequest = requests.get(
+        "https://jsonplaceholder.typicode.com/todos?userId=" + argv[1])
+    todoList = todoRequest.json()
+
+    employeeName = employeeDict.get("name")
+    numberOfTasks = len(todoList)
+    completedTasks = [
+        dict for dict in todoList if dict.get("completed") is True]
+
+    print('Employee {} is done with tasks({}/{}):'.format(
+        employeeName,
+        len(completedTasks),
+        numberOfTasks))
+
+    for completeTask in completedTasks:
+        print("\t {}".format(completeTask.get("title")))
